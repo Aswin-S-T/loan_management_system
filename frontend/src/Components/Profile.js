@@ -1,10 +1,11 @@
 import React from 'react'
 
-function Profile() {
+function Profile(props) {
+  console.log('here data===============',props)
   return (
     <div className='p-4'>
       <h2>My Profile</h2>
-      <form>
+      {/* <form>
         <p>First Name</p>
         <input type="text" className="form-control" />
         <p>Last Name</p>
@@ -22,7 +23,7 @@ function Profile() {
             <button className='nextBtn'>Next</button>
             <button className='cancelBtn'>Cancel</button>
         </div>
-      </form>
+      </form> */}
     </div>
   );
 }
