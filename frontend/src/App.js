@@ -1,6 +1,9 @@
 import {React} from "react"
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import AccountInformation from "./Components/AccountInformation";
 import Header from "./Components/Header";
+import Profile from "./Components/Profile";
+import Table from "./Components/Table";
 function App() {
   return (
     <div className="App">
@@ -20,17 +23,17 @@ function App() {
 
         <TabPanel>
           <div className="panel-content">
-            <h1>1</h1>
+            <Table />
           </div>
         </TabPanel>
         <TabPanel>
           <div className="panel-content">
-            <h1>2</h1>
+            <Profile />
           </div>
         </TabPanel>
         <TabPanel>
           <div className="panel-content">
-            <h1>3</h1>
+           <AccountInformation />
           </div>
         </TabPanel>
         
