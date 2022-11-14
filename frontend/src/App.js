@@ -7,15 +7,33 @@ import LoadingBox from "./Components/LoadingBox";
 import MessageBox from "./Components/MessageBox";
 import Profile from "./Components/Profile";
 import Table from "./Components/Table";
-function App() {
+function App(props) {
   const [users, setUser] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [length, setLength] = useState(0);
-
-  const getProfile = (id)=>{
-    console.log('PROFILE CALLED ID : ',id)
+  const [userDetails,setUserDetails] = useState('')
+  const [loanId,setLoanId] = useState('')
+  
+  const updateStatus = async(e)=>{
+    let currentUser = JSON.parse(localStorage.getItem("current_user"))
+    const updatedUser = await axios.post(`http://localhost:5000/api/v1/user/update-user/${currentUser.loan_id}`)
+    if (updatedUser.data.status == 200) {
+      alert("Status Updated");
+    }
   }
+
+  const setCurrentUser = (userdata)=>{
+    localStorage.setItem("current_user", JSON.stringify(userdata));
+  }
+
+  const getProfile = async(id)=>{
+    let user = await axios.get(`http://localhost:5000/api/v1/user/get-user/${id}`)
+    setUserDetails(user.data.data[0]);
+    
+  }
+
+  
 
   useEffect(() => {
     try {
@@ -23,7 +41,6 @@ function App() {
         const userdata = await axios.get(
           "http://localhost:5000/api/v1/user/all-users"
         );
-        // console.log(userdata.data.data);
         setUser(userdata.data.data);
       };
       fetchData();
@@ -31,77 +48,36 @@ function App() {
       setError("dsdsdsd");
     }
   }, []);
-  const openCity = (evt, cityName)=> {
-    console.log('CALLED************')
+  const openTab = (evt, cityName)=> {
     var i, tabcontent, tablinks;
-
-    // Get all elements with class="tabcontent" and hide them
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
     }
-
-    // Get all elements with class="tablinks" and remove the class "active"
     tablinks = document.getElementsByClassName("tablinks");
     for (i = 0; i < tablinks.length; i++) {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
 
-    // Show the current tab, and add an "active" class to the link that opened the tab
     document.getElementById(cityName).style.display = "block";
     evt.currentTarget.className += " active";
   }
   return (
-    // <div className="App">
-    //   <Header />
-    //   <Tabs>
-    //     <TabList>
-    //       <Tab onClick={check}>
-    //         <p>Loan Dashboard</p>
-    //       </Tab>
-    //       <Tab>
-    //         <p>My Profile</p>
-    //       </Tab>
-    //       <Tab>
-    //         <p>Accountant Information</p>
-    //       </Tab>
-    //       <Tab>
-    //         <p>test</p>
-    //       </Tab>
-    //     </TabList>
-
-    //     <TabPanel>
-    //       <div className="panel-content">
-    //         <Table />
-    //       </div>
-    //     </TabPanel>
-    //     <TabPanel>
-    //       <div className="panel-content">
-    //         <Profile />
-    //       </div>
-    //     </TabPanel>
-    //     <TabPanel>
-    //       <div className="panel-content">
-    //         <AccountInformation />
-    //       </div>
-    //     </TabPanel>
-    //   </Tabs>
-    // </div>
     <div className="App">
+      <Header />
       <div class="tab">
-        <button class="tablinks" onClick={(e) => openCity(e, "dashboard")}>
+        <button class="tablinks" onClick={(e) => openTab(e, "dashboard")}>
           Loan Dashboard
         </button>
-        <button class="tablinks" onClick={(e) => openCity(e, "profile")}>
+        <button class="tablinks" onClick={(e) => openTab(e, "profile")}>
           My Profile
         </button>
-        <button class="tablinks" onClick={(e) => openCity(e, "information")}>
+        <button class="tablinks" onClick={(e) => openTab(e, "information")}>
           Accountant Information
         </button>
       </div>
 
       <div id="dashboard" class="tabcontent">
-       
         <div className="container-fluid">
           <h2>Welcome User</h2>
           {loading ? (
@@ -128,9 +104,12 @@ function App() {
                       <td>
                         <button
                           class="tablinks btn btn-primary"
-                          onClick={(e) => {openCity(e, "profile");getProfile(user.loan_id)}}
+                          onClick={(e) => {
+                            openTab(e, "profile");
+                            getProfile(user.loan_id);
+                          }}
                         >
-                          test
+                          Save
                         </button>
                       </td>
                     </tr>
@@ -139,19 +118,69 @@ function App() {
             </table>
           )}
         </div>
-        {/* <button class="tablinks" onClick={(e) => openCity(e, "information")}>
-          test
-        </button> */}
       </div>
 
       <div id="profile" class="tabcontent" style={{ display: "none" }}>
-        <h3>Paris</h3>
-        <p>Paris is the capital of France.</p>
+        <h3>My Profile</h3>
+        <form>
+          <p>First Name</p>
+          <input
+            type="text"
+            className="form-control"
+            value={userDetails.first_name}
+          />
+          <p>Last Name</p>
+          <input
+            type="text"
+            className="form-control"
+            value={userDetails.last_name}
+          />
+          <p>E-mail address</p>
+          <input
+            type="email"
+            className="form-control"
+            value={userDetails.email}
+          />
+          <p>Region</p>
+          <select className="form-control">
+            <option>option1</option>
+            <option>option2</option>
+            <option>option3</option>
+            <option>option4</option>
+          </select>
+          <div className="BtnList mt-2">
+            <button
+              className="nextBtn"
+              onClick={(e) => {
+                e.preventDefault()
+                openTab(e, "information");
+                setCurrentUser(userDetails)
+              }}
+            >
+              Next
+            </button>
+            <button className="cancelBtn">Cancel</button>
+          </div>
+        </form>
       </div>
 
       <div id="information" class="tabcontent" style={{ display: "none" }}>
-        <h3>information</h3>
-        <p>information is the capital of Japan.</p>
+        <h3>Account Information</h3>
+        <form>
+          <p>Accounting Firm</p>
+          <input type="text" className="form-control" />
+          <p>Accountant's Name</p>
+          <input type="text" className="form-control" />
+          <p>Accountant's Telephone Number</p>
+          <input type="text" className="form-control" />
+          <p>Accountant's Email Address</p>
+          <input type="email" className="form-control" />
+
+          <div className="BtnList mt-2">
+            <button className="nextBtn" onClick={(e)=>{e.preventDefault();updateStatus("test");}}>Submit</button>
+            <button className="cancelBtn">Cancel</button>
+          </div>
+        </form>
       </div>
     </div>
   );

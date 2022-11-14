@@ -19,6 +19,26 @@ userRouter.get("/all-users", async (req, res) => {
   res.send(response);
 });
 
+userRouter.get('/get-user/:id',async(req,res)=>{
+  let userId = req.params.id
+  let user = await User.find({loan_id : userId})
+  let response = {};
+  response.status = 200;
+  response.success = true;
+  response.data = user;
 
+  res.send(response);
+})
+
+userRouter.post('/update-user/:id',async(req,res)=>{
+  let userId = req.params.id;
+  let response = {};
+  let user = await User.findOneAndUpdate({ loan_id: userId },{$set:{"status" : "submitted"}});
+  if (user){
+    response.status = 200;
+    response.success = true;
+  }
+  res.send(response)
+})
 
 module.exports = userRouter;

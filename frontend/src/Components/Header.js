@@ -12,7 +12,7 @@ function Header() {
             class="d-inline-block align-top"
             alt=""
           />
-          Loan Management System
+          <span style={{top:"21px",position:"absolute",fontWeight:"bold",color:"blue"}}>Loan Management System</span>
         </a>
       </nav>
     </div>
